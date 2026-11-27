@@ -8,28 +8,28 @@ class Agenturm < Formula
   sha256 "68e4e579fef6f162eb2d6b45a5ad724a541acfaf63a843bbd97d8c1f868f03e1"
   license "MIT"
 
-  depends_on "rust" => :build
-  depends_on "pkgconf" => :build
-  depends_on "sqlite"
-
-  on_macos do
-    depends_on arch: :arm64
-    depends_on macos: :ventura
-  end
-
-  deny_network_access!
-
   livecheck do
     url :stable
     regex(/^rust-v(\d+(?:\.\d+)+)$/i)
     strategy :github_latest
   end
 
+  on_macos do
+    depends_on arch: :arm64
+    depends_on macos: :ventura
+  end
+
+  depends_on "pkgconf" => :build
+  depends_on "rust" => :build
+  depends_on "sqlite"
+
+  deny_network_access!
+
   post_install_steps do
     run "agenturm-regenerate-catalog",
-        base: :libexec,
+        base:           :libexec,
         writable_paths: ["agenturm-plugins.json"],
-        writable_base: :prefix
+        writable_base:  :prefix
   end
 
   def fetch
@@ -46,15 +46,11 @@ class Agenturm < Formula
     binaries += adapters.map { |adapter| "agenturm-#{adapter}-harness" }
 
     build_args = ["build", "--release", "--locked", "--offline"]
-    binaries.each { |binary| build_args.concat(["--bin", binary]) }
+    binaries.each { |binary| build_args.push("--bin", binary) }
     system "cargo", *build_args
 
     binaries.each { |binary| bin.install "target/release/#{binary}" }
-    install_catalog_generator
-    system libexec/"agenturm-regenerate-catalog"
-  end
 
-  def install_catalog_generator
     generator = <<~'SH'
       #!/bin/sh
       set -eu
@@ -91,6 +87,7 @@ class Agenturm < Formula
     libexec.mkpath
     (libexec/"agenturm-regenerate-catalog").write(generator)
     (libexec/"agenturm-regenerate-catalog").chmod(0755)
+    system libexec/"agenturm-regenerate-catalog"
   end
 
   test do
