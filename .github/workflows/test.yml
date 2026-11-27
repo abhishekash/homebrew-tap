@@ -22,7 +22,7 @@ jobs:
       - name: Add this checkout as the tap
         run: brew tap abhishekash/tap "$GITHUB_WORKSPACE"
       - name: Install the published formula archive
-        run: brew install --build-from-source abhishekash/tap/agenturm
+        run: brew install abhishekash/tap/agenturm
       - name: Verify installed command, plugin host, and Codex/Pi collection
         run: brew test --verbose abhishekash/tap/agenturm
       - name: Check formula style
