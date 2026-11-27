@@ -16,12 +16,12 @@ class Agenturm < Formula
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
 
+  uses_from_macos "sqlite"
+
   on_macos do
     depends_on arch: :arm64
     depends_on macos: :ventura
   end
-
-  uses_from_macos "sqlite"
 
   deny_network_access!
 
