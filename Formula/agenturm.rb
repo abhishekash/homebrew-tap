@@ -43,7 +43,8 @@ class Agenturm < Formula
     assert_match "agenturm 0.3.10", shell_output("#{bin}/agenturm --version")
 
     mktemp do |tmp|
-      home = Pathname(tmp)/"home"
+      tmp_path = Pathname.new(tmp.to_s)
+      home = tmp_path/"home"
       codex = home/".codex/sessions/2026/11/20"
       pi = home/".pi/agent/sessions/project"
       codex.mkpath
@@ -59,9 +60,9 @@ class Agenturm < Formula
       JSONL
 
       config = shell_output("#{bin}/agenturm discover --sessions-per-harness 1", env: { "HOME" => home.to_s })
-      config_path = Pathname(tmp)/"sources.json"
+      config_path = tmp_path/"sources.json"
       config_path.write(config)
-      database = Pathname(tmp)/"history.sqlite"
+      database = tmp_path/"history.sqlite"
       system({ "HOME" => home.to_s }, bin/"agenturm", "collect", "--config", config_path, "--db", database)
       rows = JSON.parse(shell_output("#{bin}/agenturm query --db #{database}"))["observations"]
       usage = rows.filter_map do |row|
