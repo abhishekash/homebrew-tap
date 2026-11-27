@@ -1,9 +1,9 @@
 class Agenturm < Formula
   desc "Terminal cockpit for AI coding agent sessions"
   homepage "https://www.agenturm.dev"
+  version "0.3.10"
   url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.10/agenturm-0.3.10-linux-x86_64.tar.gz"
   sha256 "40911d4dbc50f1effb914d7616e02416afa3468d7e6f0d52b9ba727d55db2041"
-  version "0.3.10"
   license "MIT"
 
   on_macos do
@@ -29,7 +29,9 @@ class Agenturm < Formula
       libexec.install bundle.first => "agenturm"
       app = libexec/"agenturm"
     else
-      odie "Expected one Agenturm bundle root" unless bundle.empty? && File.file?("agenturm-plugins.json") && File.directory?("bin")
+      odie "Expected at most one Agenturm bundle root" if bundle.length > 1
+      odie "Missing Agenturm plugin catalog" unless File.file?("agenturm-plugins.json")
+      odie "Missing Agenturm binary directory" unless File.directory?("bin")
 
       libexec.install Dir["*"]
       app = libexec
@@ -57,24 +59,21 @@ class Agenturm < Formula
       {"type":"message","id":"assistant-1","timestamp":"2026-11-20T12:00:01Z","message":{"role":"assistant","stopReason":"stop","usage":{"input":8,"output":3},"content":[]}}
     JSONL
 
-    previous_home = ENV["HOME"]
     ENV["HOME"] = home.to_s
-    begin
-      config = shell_output("#{bin}/agenturm discover --sessions-per-harness 1")
-      config_path = testpath/"sources.json"
-      config_path.write(config)
-      database = testpath/"history.sqlite"
-      system bin/"agenturm", "collect", "--config", config_path, "--db", database
-      rows = JSON.parse(shell_output("#{bin}/agenturm query --db #{database}"))["observations"]
-      usage = rows.filter_map do |row|
-        next unless row.dig("observation", "kind") == "usage"
+    config = shell_output("#{bin}/agenturm discover --sessions-per-harness 1")
+    config_path = testpath/"sources.json"
+    config_path.write(config)
+    database = testpath/"history.sqlite"
+    system bin/"agenturm", "collect", "--config", config_path, "--db", database
+    rows = JSON.parse(shell_output("#{bin}/agenturm query --db #{database}"))["observations"]
+    usage = rows.filter_map do |row|
+      if row.dig("observation", "kind") != "usage"
+        next
+      end
 
-        [row.dig("identity", "session_id"), row.dig("observation", "input_tokens"),
-         row.dig("observation", "output_tokens")]
-      end.sort
-      assert_equal [["brew-codex", 7, 3], ["brew-pi", 8, 3]], usage
-    ensure
-      ENV["HOME"] = previous_home
+      [row.dig("identity", "session_id"), row.dig("observation", "input_tokens"),
+       row.dig("observation", "output_tokens")]
     end
+    assert_equal [["brew-codex", 7, 3], ["brew-pi", 8, 3]], usage.sort
   end
 end
