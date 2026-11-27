@@ -6,7 +6,7 @@ Install Agenturm with Homebrew:
 brew install abhishekash/tap/agenturm
 ```
 
-The formula installs the published Rust 0.3.10 bundle. It supports Apple
+The formula installs the published Rust 0.3.11 bundle. It supports Apple
 Silicon Macs running macOS 13 or later and Linux on x86_64 or aarch64. Intel
 Macs are not supported. The full bundle stays together under Homebrew's
 `libexec`, so the executable can find its plugin host, harnesses, and catalog.

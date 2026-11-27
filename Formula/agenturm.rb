@@ -1,9 +1,9 @@
 class Agenturm < Formula
   desc "Terminal cockpit for AI coding agent sessions"
   homepage "https://www.agenturm.dev"
-  url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.10/agenturm-0.3.10-linux-x86_64.tar.gz"
-  version "0.3.10"
-  sha256 "40911d4dbc50f1effb914d7616e02416afa3468d7e6f0d52b9ba727d55db2041"
+  url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.11/agenturm-0.3.11-linux-x86_64.tar.gz"
+  version "0.3.11"
+  sha256 "9a355a9ec2755114effb1b0bdc81e488cac4b51afbf11012659312b8fcdb4f57"
   license "MIT"
 
   on_macos do
@@ -11,20 +11,20 @@ class Agenturm < Formula
     depends_on macos: :ventura
 
     on_arm do
-      url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.10/agenturm-0.3.10-macos-aarch64.tar.gz"
-      sha256 "d02a389c2bef8db187037254d48c13ffd6bc507b8b17d93af000c29b96d71c1c"
+      url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.11/agenturm-0.3.11-macos-aarch64.tar.gz"
+      sha256 "a26b16063c31fc58a8aadcbbb38bff9e9c12059c2f0967bde4c1f5fd5879af15"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.10/agenturm-0.3.10-linux-aarch64.tar.gz"
-      sha256 "2e2bc311d8fb547132a7577b152d4296b71a14bec1a66e7c1e5578a327aa40d2"
+      url "https://github.com/abhishekash/agenturm/releases/download/rust-v0.3.11/agenturm-0.3.11-linux-aarch64.tar.gz"
+      sha256 "5cfda4903c1f905fcea61c51f713a54fdd40fef00088e1bc61c0bc42c57b09d2"
     end
   end
 
   def install
-    bundle = Dir["agenturm-0.3.10-*"]
+    bundle = Dir["agenturm-0.3.11-*"]
     if bundle.length == 1
       libexec.install bundle.first => "agenturm"
       app = libexec/"agenturm"
@@ -42,7 +42,7 @@ class Agenturm < Formula
   test do
     require "json"
 
-    assert_match "agenturm 0.3.10", shell_output("#{bin}/agenturm --version")
+    assert_match "agenturm 0.3.11", shell_output("#{bin}/agenturm --version")
 
     home = testpath/"home"
     codex = home/".codex/sessions/2026/11/20"
