@@ -51,12 +51,16 @@ jobs:
           core: shallow
       - name: Verify this checkout is the tap
         run: test "$(git -C "$(brew --repository abhishekash/tap)" rev-parse HEAD)" = "$(git rev-parse HEAD)"
+      - name: Check source formula style and candidate parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew style Formula/agenturm-source.rb
+          sed 's/^class AgenturmSource < Formula$/class Agenturm < Formula/' Formula/agenturm-source.rb | diff - core-candidate/agenturm.rb
       - name: Build Agenturm from the pinned source release
         run: HOMEBREW_NO_INSTALL_FROM_API=1 brew install --build-bottle abhishekash/tap/agenturm-source
       - name: Verify source-built binary, shared SQLite, and Codex/Pi collection
         run: brew test --verbose abhishekash/tap/agenturm-source
-      - name: Check source formula style
-        run: brew style Formula/agenturm-source.rb core-candidate/agenturm.rb
       - name: Audit new source formula
         run: brew audit --strict --new --online --formula abhishekash/tap/agenturm-source
       - name: Verify livecheck detects the stable Rust release

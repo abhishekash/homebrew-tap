@@ -91,7 +91,8 @@ class Agenturm < Formula
 
   test do
     assert_match "agenturm #{version}", shell_output("#{bin}/agenturm --version")
-    sqlite_linkage = shell_output("#{OS.mac? ? "otool -L" : "ldd"} #{bin}/agenturm")
+    linkage_tool = OS.mac? ? "otool -L" : "ldd"
+    sqlite_linkage = shell_output("#{linkage_tool} #{bin}/agenturm")
     expected_sqlite = OS.mac? ? "libsqlite3.dylib" : "libsqlite3.so"
     assert_match expected_sqlite, sqlite_linkage
 
