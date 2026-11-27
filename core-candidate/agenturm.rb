@@ -4,7 +4,6 @@ class Agenturm < Formula
   desc "Terminal cockpit for AI coding agent sessions"
   homepage "https://www.agenturm.dev"
   url "https://github.com/abhishekash/agenturm/archive/refs/tags/rust-v0.3.11.tar.gz"
-  version "0.3.11"
   sha256 "68e4e579fef6f162eb2d6b45a5ad724a541acfaf63a843bbd97d8c1f868f03e1"
   license "MIT"
 
@@ -25,12 +24,6 @@ class Agenturm < Formula
 
   deny_network_access!
 
-  post_install_steps do
-    run "agenturm-regenerate-catalog",
-        base: :libexec,
-        writable_paths: [{ path: "agenturm-plugins.json", base: :prefix }]
-  end
-
   def fetch
     system "cargo", "fetch", *std_cargo_fetch_args
   end
@@ -45,15 +38,11 @@ class Agenturm < Formula
     binaries += adapters.map { |adapter| "agenturm-#{adapter}-harness" }
 
     build_args = ["build", "--release", "--locked", "--offline"]
-    binaries.each { |binary| build_args.concat(["--bin", binary]) }
+    binaries.each { |binary| build_args.push("--bin", binary) }
     system "cargo", *build_args
 
     binaries.each { |binary| bin.install "target/release/#{binary}" }
-    install_catalog_generator
-    system libexec/"agenturm-regenerate-catalog"
-  end
 
-  def install_catalog_generator
     generator = <<~'SH'
       #!/bin/sh
       set -eu
@@ -90,6 +79,14 @@ class Agenturm < Formula
     libexec.mkpath
     (libexec/"agenturm-regenerate-catalog").write(generator)
     (libexec/"agenturm-regenerate-catalog").chmod(0755)
+    system libexec/"agenturm-regenerate-catalog"
+  end
+
+  post_install_steps do
+    run "agenturm-regenerate-catalog",
+        base:           :libexec,
+        writable_paths: ["agenturm-plugins.json"],
+        writable_base:  :prefix
   end
 
   test do
