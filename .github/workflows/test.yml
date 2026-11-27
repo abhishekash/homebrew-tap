@@ -48,7 +48,7 @@ jobs:
           persist-credentials: false
       - uses: Homebrew/actions/setup-homebrew@70b5b34b56f36e0f19ef154095b3c0cbb03089a3 # main
         with:
-          core: true
+          core: shallow
       - name: Verify this checkout is the tap
         run: test "$(git -C "$(brew --repository abhishekash/tap)" rev-parse HEAD)" = "$(git rev-parse HEAD)"
       - name: Build Agenturm from the pinned source release

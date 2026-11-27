@@ -16,7 +16,7 @@ jobs:
           persist-credentials: false
       - uses: Homebrew/actions/setup-homebrew@70b5b34b56f36e0f19ef154095b3c0cbb03089a3 # main
         with:
-          core: true
+          core: shallow
       - name: Stage source formula in core
         shell: bash
         run: |
