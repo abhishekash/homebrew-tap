@@ -26,8 +26,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: Homebrew/actions/setup-homebrew@70b5b34b56f36e0f19ef154095b3c0cbb03089a3 # main
-      - name: Add this checkout as the tap
-        run: brew tap abhishekash/tap "$GITHUB_WORKSPACE"
+      - name: Verify this checkout is the tap
+        run: test "$(git -C "$(brew --repository abhishekash/tap)" rev-parse HEAD)" = "$(git rev-parse HEAD)"
       - name: Install the published formula archive
         run: brew install abhishekash/tap/agenturm
       - name: Verify installed command, plugin host, and Codex/Pi collection
@@ -49,10 +49,10 @@ jobs:
         with:
           persist-credentials: false
       - uses: Homebrew/actions/setup-homebrew@70b5b34b56f36e0f19ef154095b3c0cbb03089a3 # main
-      - name: Add this checkout as the tap
-        run: brew tap abhishekash/tap "$GITHUB_WORKSPACE"
+      - name: Verify this checkout is the tap
+        run: test "$(git -C "$(brew --repository abhishekash/tap)" rev-parse HEAD)" = "$(git rev-parse HEAD)"
       - name: Build Agenturm from the pinned source release
-        run: brew install --build-from-source --build-bottle abhishekash/tap/agenturm-source
+        run: HOMEBREW_NO_INSTALL_FROM_API=1 brew install --build-from-source --build-bottle abhishekash/tap/agenturm-source
       - name: Verify source-built binary, shared SQLite, and Codex/Pi collection
         run: brew test --verbose abhishekash/tap/agenturm-source
       - name: Check source formula style
