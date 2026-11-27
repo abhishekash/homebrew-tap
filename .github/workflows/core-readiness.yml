@@ -1,0 +1,45 @@
+name: Homebrew core readiness
+
+on:
+  pull_request:
+    paths: ["core-candidate/**", ".github/workflows/core-readiness.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-audit:
+    name: Audit proposed core formula
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: Homebrew/actions/setup-homebrew@70b5b34b56f36e0f19ef154095b3c0cbb03089a3 # main
+        with:
+          core: shallow
+      - name: Stage source formula in core
+        shell: bash
+        run: |
+          set -euo pipefail
+          core=$(brew --repository homebrew/core)
+          test ! -e "$core/Formula/a/agenturm.rb"
+          cp core-candidate/agenturm.rb "$core/Formula/a/agenturm.rb"
+      - name: Check proposed core formula style
+        run: brew style "$(brew --repository homebrew/core)/Formula/a/agenturm.rb"
+      - name: Audit core acceptance requirements
+        id: audit
+        continue-on-error: true
+        run: brew audit --strict --new --online --formula homebrew/core/agenturm
+      - name: Report core eligibility separately from tap checks
+        if: always()
+        shell: bash
+        env:
+          CORE_AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+        run: |
+          if [[ "$CORE_AUDIT_OUTCOME" == success ]]; then
+            echo 'Core strict new-formula audit passed.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Core strict new-formula audit did not pass. Inspect the audit log for acceptance blockers. This informational result does not gate third-party tap installation.' >> "$GITHUB_STEP_SUMMARY"
+          fi

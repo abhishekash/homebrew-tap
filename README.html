@@ -20,8 +20,15 @@
     <h1>Agenturm Homebrew tap</h1>
     <p>Install the Rust 0.3.11 bundle with Homebrew:</p>
     <pre><code>brew install abhishekash/tap/agenturm</code></pre>
-    <p>Supported systems are Apple Silicon Macs running macOS 13 or later and Linux on x86_64 or aarch64. Intel Macs are not supported.</p>
+    <p>Supported systems are Apple Silicon Macs running macOS 13 or later and Linux (glibc 2.39+) on x86_64 or aarch64. Intel Macs are not supported.</p>
     <p>The full bundle remains together under Homebrew’s <code>libexec</code>, so Agenturm can find its plugin host, harnesses, and catalog. Installation and runtime do not require Python or a Rust toolchain.</p>
+    <h2>Build from source</h2>
+    <pre><code>brew install abhishekash/tap/agenturm-source</code></pre>
+    <p>The source alternative builds the immutable Rust 0.3.11 archive with locked Cargo dependencies, macOS system SQLite on Mac, and Homebrew SQLite on Linux. Homebrew installs Rust and pkgconf for the build. Python is not required. Uninstall the binary formula before installing the source formula, because they provide the same commands. Update with <code>brew upgrade agenturm-source</code>.</p>
+    <p>CI covers binary installs and source builds on Apple Silicon, Linux x86_64, and Linux ARM64, including functional discovery and collection, shared SQLite linkage, style, strict new-formula audit, livecheck, bottle reinstallation, and repeat checksum regeneration.</p>
+    <h2>Homebrew core submission</h2>
+    <p><code>core-candidate/agenturm.rb</code> contains the source formula under its proposed core name. A fresh <code>brew install agenturm</code> requires acceptance into Homebrew core. Until then, use the fully qualified tap command above. See <a href="https://docs.brew.sh/Package-Acceptance-Policy">Homebrew’s public-interest requirements</a>. Homebrew requires human review of AI-assisted submissions and human-written responses to maintainer feedback.</p>
+    <p>The <strong>Homebrew core readiness</strong> workflow (on candidate PRs or manual dispatch) stages the candidate in a real core checkout and runs strict new-formula audit. Core acceptance failures are reported separately from tap validation.</p>
     <h2>Update</h2>
     <pre><code>brew update
 brew upgrade agenturm</code></pre>
