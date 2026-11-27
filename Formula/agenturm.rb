@@ -25,10 +25,16 @@ class Agenturm < Formula
 
   def install
     bundle = Dir["agenturm-0.3.10-*"]
-    odie "Expected exactly one Agenturm release bundle" unless bundle.length == 1
+    if bundle.length == 1
+      libexec.install bundle.first => "agenturm"
+      app = libexec/"agenturm"
+    else
+      odie "Expected one Agenturm bundle root" unless bundle.empty? && File.file?("agenturm-plugins.json") && File.directory?("bin")
 
-    libexec.install bundle.first => "agenturm"
-    bin.install_symlink libexec/"agenturm/bin/agenturm" => "agenturm"
+      libexec.install Dir["*"]
+      app = libexec
+    end
+    bin.install_symlink app/"bin/agenturm" => "agenturm"
   end
 
   test do
