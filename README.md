@@ -7,7 +7,7 @@ brew install abhishekash/tap/agenturm
 ```
 
 The formula installs the published Rust 0.3.11 bundle. It supports Apple
-Silicon Macs running macOS 13 or later and Linux on x86_64 or aarch64. Intel
+Silicon Macs running macOS 13 or later and Linux (glibc 2.39+) on x86_64 or aarch64. Intel
 Macs are not supported. The full bundle stays together under Homebrew's
 `libexec`, so the executable can find its plugin host, harnesses, and catalog.
 
@@ -34,8 +34,8 @@ brew install abhishekash/tap/agenturm-source
 ```
 
 This alternative builds the immutable Rust 0.3.11 source archive with the
-locked Cargo dependencies and links Homebrew SQLite. Homebrew installs Rust
-and pkgconf for the build. Python is not required. The source formula and
+locked Cargo dependencies. It links macOS system SQLite on Mac and
+Homebrew SQLite on Linux. Homebrew installs Rust and pkgconf for the build. Python is not required. The source formula and
 the binary formula install the same commands; uninstall one before installing
 the other. Use `brew upgrade agenturm-source` to update the source installation.
 

@@ -15,12 +15,13 @@ class Agenturm < Formula
 
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
-  depends_on "sqlite"
 
   on_macos do
     depends_on arch: :arm64
     depends_on macos: :ventura
   end
+
+  uses_from_macos "sqlite"
 
   deny_network_access!
 
@@ -93,7 +94,7 @@ class Agenturm < Formula
     assert_match "agenturm #{version}", shell_output("#{bin}/agenturm --version")
     linkage_tool = OS.mac? ? "otool -L" : "ldd"
     sqlite_linkage = shell_output("#{linkage_tool} #{bin}/agenturm")
-    expected_sqlite = OS.mac? ? "libsqlite3.dylib" : "libsqlite3.so"
+    expected_sqlite = OS.mac? ? "/usr/lib/libsqlite3.dylib" : "libsqlite3.so"
     assert_match expected_sqlite, sqlite_linkage
 
     home = testpath/"home"
