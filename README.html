@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Agenturm Homebrew tap</title>
+  <style>
+    :root { color-scheme: light dark; font: 16px/1.6 ui-sans-serif, system-ui, sans-serif; }
+    body { max-width: 48rem; margin: 3rem auto; padding: 0 1.25rem; }
+    h1, h2 { line-height: 1.2; }
+    pre { overflow-x: auto; padding: 1rem; border-radius: .6rem; background: color-mix(in srgb, CanvasText 8%, Canvas); }
+    code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    a { color: LinkText; }
+    @media (max-width: 40rem) { body { margin: 1.5rem auto; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Agenturm Homebrew tap</h1>
+    <p>Install the Rust 0.3.10 bundle with Homebrew:</p>
+    <pre><code>brew install abhishekash/tap/agenturm</code></pre>
+    <p>Supported systems are Apple Silicon Macs running macOS 13 or later and Linux on x86_64 or aarch64. Intel Macs are not supported.</p>
+    <p>The full bundle remains together under Homebrew’s <code>libexec</code>, so Agenturm can find its plugin host, harnesses, and catalog. Installation and runtime do not require Python or a Rust toolchain.</p>
+    <h2>Update</h2>
+    <pre><code>brew update
+brew upgrade agenturm</code></pre>
+    <h2>Uninstall</h2>
+    <pre><code>brew uninstall agenturm</code></pre>
+  </main>
+</body>
+</html>
