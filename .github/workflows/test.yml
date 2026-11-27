@@ -26,4 +26,4 @@ jobs:
       - name: Verify installed command, plugin host, and Codex/Pi collection
         run: brew test --verbose abhishekash/tap/agenturm
       - name: Check formula style
-        run: brew style --fix=false Formula/agenturm.rb
+        run: brew style Formula/agenturm.rb
