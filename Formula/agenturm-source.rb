@@ -1,4 +1,3 @@
-require "digest"
 require "json"
 
 class AgenturmSource < Formula
@@ -26,6 +25,12 @@ class AgenturmSource < Formula
     strategy :github_latest
   end
 
+  post_install_steps do
+    run "agenturm-regenerate-catalog",
+        base: :libexec,
+        writable_paths: [{ path: "agenturm-plugins.json", base: :prefix }]
+  end
+
   def fetch
     system "cargo", "fetch", *std_cargo_fetch_args
   end
@@ -44,71 +49,47 @@ class AgenturmSource < Formula
     system "cargo", *build_args
 
     binaries.each { |binary| bin.install "target/release/#{binary}" }
-    write_plugin_catalog(adapters)
+    install_catalog_generator
+    system libexec/"agenturm-regenerate-catalog"
   end
 
-  def post_install
-    # Homebrew may rewrite linked SQLite paths when pouring a bottle. Refresh
-    # adapter hashes after those relocations so the catalog matches installed files.
-    write_plugin_catalog(%w[codex pi claude kiro opencode])
-  end
+  def install_catalog_generator
+    generator = <<~'SH'
+      #!/bin/sh
+      set -eu
+      script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+      prefix=${script_dir%/libexec}
+      if command -v shasum >/dev/null 2>&1; then
+        sha256_of() { shasum -a 256 -- "$1" | awk '{print $1}'; }
+      elif command -v sha256sum >/dev/null 2>&1; then
+        sha256_of() { sha256sum -- "$1" | awk '{print $1}'; }
+      else
+        echo "shasum or sha256sum is required to refresh the adapter catalog" >&2
+        exit 1
+      fi
+      emit() {
+        adapter=$1
+        discovery=$2
+        digest=$(sha256_of "$prefix/bin/agenturm-$adapter-harness")
+        printf '%s{"plugin_id":"example.rust-%s-harness","adapter":"bin/agenturm-%s-harness","sha256":"%s","protocol":1,"features":["source-adapter/1","configured-root/1"],"observation_format":"agenturm-observations/1","discovery":{%s}}' \
+          "$separator" "$adapter" "$adapter" "$digest" "$discovery"
+        separator=$(printf ',\n')
+      }
+      separator=
+      {
+        printf '{"version":1,"plugins":[\n'
+        emit codex '"namespace":"codex","root_env":"CODEX_HOME","default_root":".codex/sessions","env_suffix":"sessions","shape":"codex_jsonl_tree"'
+        emit pi '"namespace":"pi","root_env":"PI_CODING_AGENT_DIR","default_root":".pi/agent/sessions","env_suffix":"sessions","shape":"jsonl_tree"'
+        emit claude '"namespace":"claude","root_env":"CLAUDE_CONFIG_DIR","default_root":".claude/projects","env_suffix":"projects","shape":"jsonl_tree"'
+        emit kiro '"namespace":"kiro","root_env":"KIRO_HOME","default_root":".kiro/sessions","env_suffix":"sessions","shape":"kiro_jsonl_tree"'
+        emit opencode '"namespace":"opencode","root_env":"OPENCODE_DB","default_root":".local/share/opencode/opencode.db","macos_default_root":"Library/Application Support/opencode/opencode.db","fallback_base_env":"XDG_DATA_HOME","fallback_suffix":"opencode/opencode.db","shape":"sqlite_file"'
+        printf '\n]}\n'
+      } > "$prefix/agenturm-plugins.json"
+    SH
 
-  def plugin_catalog(adapters)
-    discovery = {
-      "codex" => {
-        "namespace" => "codex",
-        "root_env" => "CODEX_HOME",
-        "default_root" => ".codex/sessions",
-        "env_suffix" => "sessions",
-        "shape" => "codex_jsonl_tree",
-      },
-      "pi" => {
-        "namespace" => "pi",
-        "root_env" => "PI_CODING_AGENT_DIR",
-        "default_root" => ".pi/agent/sessions",
-        "env_suffix" => "sessions",
-        "shape" => "jsonl_tree",
-      },
-      "claude" => {
-        "namespace" => "claude",
-        "root_env" => "CLAUDE_CONFIG_DIR",
-        "default_root" => ".claude/projects",
-        "env_suffix" => "projects",
-        "shape" => "jsonl_tree",
-      },
-      "kiro" => {
-        "namespace" => "kiro",
-        "root_env" => "KIRO_HOME",
-        "default_root" => ".kiro/sessions",
-        "env_suffix" => "sessions",
-        "shape" => "kiro_jsonl_tree",
-      },
-      "opencode" => {
-        "namespace" => "opencode",
-        "root_env" => "OPENCODE_DB",
-        "default_root" => ".local/share/opencode/opencode.db",
-        "macos_default_root" => "Library/Application Support/opencode/opencode.db",
-        "fallback_base_env" => "XDG_DATA_HOME",
-        "fallback_suffix" => "opencode/opencode.db",
-        "shape" => "sqlite_file",
-      },
-    }
-
-    {
-      "version" => 1,
-      "plugins" => adapters.map do |adapter|
-        executable = "bin/agenturm-#{adapter}-harness"
-        {
-          "plugin_id" => "example.rust-#{adapter}-harness",
-          "adapter" => executable,
-          "sha256" => Digest::SHA256.file(prefix/executable).hexdigest,
-          "protocol" => 1,
-          "features" => ["source-adapter/1", "configured-root/1"],
-          "observation_format" => "agenturm-observations/1",
-          "discovery" => discovery.fetch(adapter),
-        }
-      end,
-    }
+    libexec.mkpath
+    (libexec/"agenturm-regenerate-catalog").write(generator)
+    (libexec/"agenturm-regenerate-catalog").chmod(0755)
   end
 
   test do
@@ -146,10 +127,5 @@ class AgenturmSource < Formula
        row.dig("observation", "output_tokens")]
     end.sort
     assert_equal [["brew-codex", 7, 3], ["brew-pi", 8, 3]], usage
-  end
-
-  def write_plugin_catalog(adapters)
-    catalog = plugin_catalog(adapters)
-    (prefix/"agenturm-plugins.json").write(JSON.pretty_generate(catalog) + "\n")
   end
 end
