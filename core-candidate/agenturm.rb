@@ -25,13 +25,6 @@ class Agenturm < Formula
 
   deny_network_access!
 
-  post_install_steps do
-    run "agenturm-regenerate-catalog",
-        base:           :libexec,
-        writable_paths: ["agenturm-plugins.json"],
-        writable_base:  :prefix
-  end
-
   def fetch
     system "cargo", "fetch", *std_cargo_fetch_args
   end
@@ -88,6 +81,13 @@ class Agenturm < Formula
     (libexec/"agenturm-regenerate-catalog").write(generator)
     (libexec/"agenturm-regenerate-catalog").chmod(0755)
     system libexec/"agenturm-regenerate-catalog"
+  end
+
+  post_install_steps do
+    run "agenturm-regenerate-catalog",
+        base:           :libexec,
+        writable_paths: ["agenturm-plugins.json"],
+        writable_base:  :prefix
   end
 
   test do
