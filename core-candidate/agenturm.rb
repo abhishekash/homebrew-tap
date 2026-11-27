@@ -14,14 +14,14 @@ class Agenturm < Formula
     strategy :github_latest
   end
 
+  depends_on "pkgconf" => :build
+  depends_on "rust" => :build
+  depends_on "sqlite"
+
   on_macos do
     depends_on arch: :arm64
     depends_on macos: :ventura
   end
-
-  depends_on "pkgconf" => :build
-  depends_on "rust" => :build
-  depends_on "sqlite"
 
   deny_network_access!
 
