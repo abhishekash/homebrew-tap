@@ -4,7 +4,6 @@ class Agenturm < Formula
   desc "Terminal cockpit for AI coding agent sessions"
   homepage "https://www.agenturm.dev"
   url "https://github.com/abhishekash/agenturm/archive/refs/tags/rust-v0.3.11.tar.gz"
-  version "0.3.11"
   sha256 "68e4e579fef6f162eb2d6b45a5ad724a541acfaf63a843bbd97d8c1f868f03e1"
   license "MIT"
 
