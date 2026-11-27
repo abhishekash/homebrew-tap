@@ -70,9 +70,12 @@ jobs:
         run: |
           set -euo pipefail
           brew bottle --json abhishekash/tap/agenturm-source
-          brew uninstall --force agenturm-source
-          bottles=(./agenturm-source--*.bottle.tar.gz)
+          shopt -s nullglob
+          bottles=(./agenturm-source--*.bottle*.tar.gz)
           test "${#bottles[@]}" -eq 1
+          test -f "${bottles[0]}"
+          [[ ${bottles[0]} =~ \.bottle(\.[0-9]+)?\.tar\.gz$ ]]
+          brew uninstall --force agenturm-source
           brew install "${bottles[0]}"
           brew test --verbose abhishekash/tap/agenturm-source
           brew postinstall abhishekash/tap/agenturm-source
