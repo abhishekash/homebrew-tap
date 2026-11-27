@@ -53,6 +53,6 @@ the formula. See the [Homebrew acceptance policy](https://docs.brew.sh/Package-A
 for the public-interest criteria. Homebrew also requires human review of
 AI-assisted submissions and human-written responses to maintainer feedback.
 
-The manually dispatched **Homebrew core readiness** workflow stages the
+The **Homebrew core readiness** workflow (on candidate PRs or manual dispatch) stages the
 candidate in a real `homebrew/core` checkout and runs strict new-formula
 audit. It reports core acceptance failures separately from tap validation.

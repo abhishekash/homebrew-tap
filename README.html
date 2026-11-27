@@ -28,7 +28,7 @@
     <p>CI covers binary installs and source builds on Apple Silicon, Linux x86_64, and Linux ARM64, including functional discovery and collection, shared SQLite linkage, style, strict new-formula audit, livecheck, bottle reinstallation, and repeat checksum regeneration.</p>
     <h2>Homebrew core submission</h2>
     <p><code>core-candidate/agenturm.rb</code> contains the source formula under its proposed core name. A fresh <code>brew install agenturm</code> requires acceptance into Homebrew core. Until then, use the fully qualified tap command above. See <a href="https://docs.brew.sh/Package-Acceptance-Policy">Homebrew’s public-interest requirements</a>. Homebrew requires human review of AI-assisted submissions and human-written responses to maintainer feedback.</p>
-    <p>The manually dispatched <strong>Homebrew core readiness</strong> workflow stages the candidate in a real core checkout and runs strict new-formula audit. Core acceptance failures are reported separately from tap validation.</p>
+    <p>The <strong>Homebrew core readiness</strong> workflow (on candidate PRs or manual dispatch) stages the candidate in a real core checkout and runs strict new-formula audit. Core acceptance failures are reported separately from tap validation.</p>
     <h2>Update</h2>
     <pre><code>brew update
 brew upgrade agenturm</code></pre>

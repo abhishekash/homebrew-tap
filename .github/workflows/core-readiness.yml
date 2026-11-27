@@ -1,6 +1,8 @@
 name: Homebrew core readiness
 
 on:
+  pull_request:
+    paths: ["core-candidate/**", ".github/workflows/core-readiness.yml"]
   workflow_dispatch:
 
 permissions:
@@ -27,4 +29,17 @@ jobs:
       - name: Check proposed core formula style
         run: brew style "$(brew --repository homebrew/core)/Formula/a/agenturm.rb"
       - name: Audit core acceptance requirements
+        id: audit
+        continue-on-error: true
         run: brew audit --strict --new --online --formula homebrew/core/agenturm
+      - name: Report core eligibility separately from tap checks
+        if: always()
+        shell: bash
+        env:
+          CORE_AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+        run: |
+          if [[ "$CORE_AUDIT_OUTCOME" == success ]]; then
+            echo 'Core strict new-formula audit passed.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Core strict new-formula audit did not pass. Inspect the audit log for acceptance blockers. This informational result does not gate third-party tap installation.' >> "$GITHUB_STEP_SUMMARY"
+          fi
