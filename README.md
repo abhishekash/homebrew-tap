@@ -52,3 +52,7 @@ without first adding the tap is available only after Homebrew core accepts
 the formula. See the [Homebrew acceptance policy](https://docs.brew.sh/Package-Acceptance-Policy)
 for the public-interest criteria. Homebrew also requires human review of
 AI-assisted submissions and human-written responses to maintainer feedback.
+
+The manually dispatched **Homebrew core readiness** workflow stages the
+candidate in a real `homebrew/core` checkout and runs strict new-formula
+audit. It reports core acceptance failures separately from tap validation.
