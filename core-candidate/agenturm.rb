@@ -28,7 +28,8 @@ class Agenturm < Formula
   post_install_steps do
     run "agenturm-regenerate-catalog",
         base: :libexec,
-        writable_paths: [{ path: "agenturm-plugins.json", base: :prefix }]
+        writable_paths: ["agenturm-plugins.json"],
+        writable_base: :prefix
   end
 
   def fetch
