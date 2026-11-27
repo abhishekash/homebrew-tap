@@ -44,7 +44,13 @@ class AgenturmSource < Formula
     system "cargo", *build_args
 
     binaries.each { |binary| bin.install "target/release/#{binary}" }
-    (prefix/"agenturm-plugins.json").write(JSON.pretty_generate(plugin_catalog(adapters)) + "\n")
+    write_plugin_catalog(adapters)
+  end
+
+  def post_install
+    # Homebrew may rewrite linked SQLite paths when pouring a bottle. Refresh
+    # adapter hashes after those relocations so the catalog matches installed files.
+    write_plugin_catalog(%w[codex pi claude kiro opencode])
   end
 
   def plugin_catalog(adapters)
@@ -107,7 +113,9 @@ class AgenturmSource < Formula
 
   test do
     assert_match "agenturm 0.3.11", shell_output("#{bin}/agenturm --version")
-    assert_match (Formula["sqlite"].opt_lib/"libsqlite3"), shell_output("#{OS.mac? ? "otool -L" : "ldd"} #{bin}/agenturm")
+    sqlite_linkage = shell_output("#{OS.mac? ? "otool -L" : "ldd"} #{bin}/agenturm")
+    expected_sqlite = OS.mac? ? "libsqlite3.dylib" : "libsqlite3.so"
+    assert_match expected_sqlite, sqlite_linkage
 
     home = testpath/"home"
     codex = home/".codex/sessions/2026/11/20"
@@ -138,5 +146,10 @@ class AgenturmSource < Formula
        row.dig("observation", "output_tokens")]
     end.sort
     assert_equal [["brew-codex", 7, 3], ["brew-pi", 8, 3]], usage
+  end
+
+  def write_plugin_catalog(adapters)
+    catalog = plugin_catalog(adapters)
+    (prefix/"agenturm-plugins.json").write(JSON.pretty_generate(catalog) + "\n")
   end
 end
